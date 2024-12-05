@@ -20,16 +20,16 @@ const Sales = ({ products, updateProducts, addSale }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-    
+
         if (name === "code") {
             setSaleProduct({ ...saleProduct, code: value });
-    
+
             // Filter products by code or name, making sure they exist and are non-empty
             const foundProducts = products.filter((product) =>
-                (product.code && product.code.toLowerCase().includes(value.toLowerCase())) ||
-                (product.name && product.name.toLowerCase().includes(value.toLowerCase()))
+                (product.urunKodu && product.urunKodu.toLowerCase().includes(value.toLowerCase())) ||
+                (product.urunAdi && product.urunAdi.toLowerCase().includes(value.toLowerCase()))
             );
-            setFilteredProducts(foundProducts); 
+            setFilteredProducts(foundProducts);
         } else {
             setSaleProduct({ ...saleProduct, [name]: value });
         }
@@ -37,10 +37,10 @@ const Sales = ({ products, updateProducts, addSale }) => {
 
     const handleProductSelect = (product) => {
         setSaleProduct({
-            code: product.code,
-            name: product.name,
-            stock: product.stock,
-            price: product.price,
+            code: product.urunKodu,
+            name: product.urunAdi,
+            stock: product.urunAdeti,
+            price: product.adetFiyati,
         });
         setFilteredProducts([]); // Seçilen ürünü aldıktan sonra öneri listesini temizle
     };
@@ -52,8 +52,8 @@ const Sales = ({ products, updateProducts, addSale }) => {
         if (saleQty > 0 && saleProduct.stock >= saleQty) {
             // Ürün satıldığında stok güncelleniyor
             const updatedProducts = products.map((product) =>
-                product.code === saleProduct.code
-                    ? { ...product, stock: product.stock - saleQty }
+                product.urunKodu === saleProduct.code
+                    ? { ...product, urunAdeti: product.urunAdeti - saleQty }
                     : product
             );
             updateProducts(updatedProducts);
@@ -99,10 +99,10 @@ const Sales = ({ products, updateProducts, addSale }) => {
                             <ul className="suggestions-list">
                                 {filteredProducts.map((product) => (
                                     <li
-                                        key={product.code}
+                                        key={product.urunKodu}
                                         onClick={() => handleProductSelect(product)}
                                     >
-                                        {product.code} - {product.name}
+                                        {product.urunKodu} - {product.urunAdi}
                                     </li>
                                 ))}
                             </ul>
