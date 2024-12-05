@@ -1,0 +1,38 @@
+#### URUN EKLEME POST
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+    "urunKodu": "TOF 31000010",
+    "urunAdi": "124 Manifold Borusu",
+    "urunAdeti": 4,
+    "adetFiyati": 250,
+    "alinanFirma": "Ender Egzoz"
+}
+
+###
+
+# Tüm ürünleri listeleme (GET)
+GET http://localhost:5000/allProducts
+
+### Urun koduna göre ürün arama (GET)
+GET http://localhost:3000/products/TOF 31000010
+
+
+# Ürün silme (DELETE)
+DELETE http://localhost:3000/products/EGZ1001
+
+### URUN SATISI POST
+POST http://localhost:3000/product-sales
+Content-Type: application/json
+
+{
+  "urunKodu": "AUD 03020030",
+  "urunAdi": "AUDI 80 Ön Borusuz Susturucu",
+  "urunStokAdeti": 3,
+  "urunSatisAdeti": 1,
+  "satisFiyati": 550,
+  "tarih": "2024-12-05"
+}
+
+

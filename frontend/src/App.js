@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Sales from "./screens/Sales";
 import SalesReport from "./screens/SalesReport";
@@ -11,6 +11,25 @@ const App = () => {
   const [showSalesReportModal, setShowSalesReportModal] = useState(false);
   const [showStockControlModal, setShowStockControlModal] = useState(false);
   const [salesData, setSalesData] = useState([]); // salesData state
+
+  // Backend'den ürünleri çekmek için useEffect
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/allproducts"); // Backend URL
+        if (response.ok) {
+          const data = await response.json(); // JSON formatında yanıt
+          setProducts(data); // Gelen veriyi state'e kaydet
+        } else {
+          console.error("Ürünler getirilemedi.");
+        }
+      } catch (error) {
+        console.error("Ürünleri getirirken bir hata oluştu:", error);
+      }
+    };
+
+    fetchProducts(); // Fonksiyonu çağır
+  }, []); // Sadece bir kez çalışması için boş bir bağımlılık dizisi
 
   const addSale = (sale) => {
     setSalesData([...salesData, sale]); // salesData'yı güncelle
@@ -60,11 +79,11 @@ const App = () => {
               <tbody>
                 {products.map((product, index) => (
                   <tr key={index}>
-                    <td>{product.code}</td>
-                    <td>{product.name}</td>
-                    <td>{product.stock}</td>
-                    <td>{product.price}</td>
-                    <td>{product.company}</td>
+                    <td>{product.urunKodu}</td>
+                    <td>{product.urunAdi}</td>
+                    <td>{product.urunAdeti}</td>
+                    <td>{product.adetFiyati}</td>
+                    <td>{product.alinanFirma}</td>
                   </tr>
                 ))}
               </tbody>

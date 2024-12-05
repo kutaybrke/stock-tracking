@@ -11,38 +11,55 @@ const AddProduct = ({ setShowModal, products, setProducts, setSalesData }) => {
 
     const [errorMessage, setErrorMessage] = useState(""); // Hata mesajı durumu
 
+
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewProduct({ ...newProduct, [name]: value });
     };
 
-    const handleAddProduct = () => {
-        // Boş alanları kontrol et
+    const handleAddProduct = async () => {
         if (!newProduct.code || !newProduct.name || !newProduct.stock || !newProduct.price || !newProduct.company) {
             setErrorMessage("Lütfen tüm alanları doldurunuz.");
-            return; // Eksik alan varsa fonksiyonu sonlandır
+            return;
         }
 
-        // Yeni ürün ekleme işlemi
-        setProducts([...products, newProduct]);
+        try {
+            const response = await fetch("http://localhost:5000/Products", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    urunKodu: newProduct.code,
+                    urunAdi: newProduct.name,
+                    urunAdeti: parseInt(newProduct.stock, 10), // Stok adedini sayıya çevir
+                    adetFiyati: parseFloat(newProduct.price), // Fiyatı sayıya çevir
+                    alinanFirma: newProduct.company,
+                }),
+            });
 
-        // Satış verilerini güncellemek için
-        setSalesData(prevSalesData => [
-            ...prevSalesData,
-            {
-                product: newProduct.name,
-                stock: newProduct.stock,
-                price: newProduct.price,
-                company: newProduct.company,
+            if (response.ok) {
+                const addedProduct = await response.json();
+                console.log("Yeni ürün eklendi:", addedProduct);
+
+                // Backend'den gelen ürünü products'a ekle
+                setProducts((prevProducts) => [...prevProducts, addedProduct]);
+
+
+
+                setShowModal(false);
+            } else {
+                const error = await response.json();
+                setErrorMessage(error.error || "Ürün eklenirken bir hata oluştu.");
             }
-        ]);
-
-        // Modal'ı kapatma
-        setShowModal(false);
-
-        // Formu sıfırlama
-        setNewProduct({ code: "", name: "", stock: "", price: "", company: "" });
+        } catch (error) {
+            console.error("Ürün ekleme hatası:", error);
+            setErrorMessage("Ürün eklenirken bir hata oluştu.");
+        }
     };
+
+
 
     // Ürün adı için sadece harf kontrolü
     const isValidName = /^[a-zA-Z\s]*$/.test(newProduct.name);
@@ -68,7 +85,7 @@ const AddProduct = ({ setShowModal, products, setProducts, setSalesData }) => {
                     value={newProduct.name}
                     onChange={handleInputChange}
                     required
-                    pattern="^[a-zA-Z\s]*$"  // Sadece harf ve boşluk
+                    pattern="^[a-zA-Z\s]*$"
                     title="Ürün adı sadece harflerden oluşmalıdır"
                 />
                 <input
@@ -79,7 +96,7 @@ const AddProduct = ({ setShowModal, products, setProducts, setSalesData }) => {
                     value={newProduct.stock}
                     onChange={handleInputChange}
                     required
-                    min="0"  // Negatif stok girmeyi engeller
+                    min="0"
                 />
                 <input
                     className="input"
@@ -106,8 +123,12 @@ const AddProduct = ({ setShowModal, products, setProducts, setSalesData }) => {
                     </div>
                 )}
                 <div className="modal-actions">
-                    <button className="addButton" onClick={handleAddProduct} disabled={!isValidName}>Kaydet</button>
-                    <button className="cancelButton" onClick={() => setShowModal(false)}>İptal</button>
+                    <button className="addButton" onClick={handleAddProduct} disabled={!isValidName}>
+                        Kaydet
+                    </button>
+                    <button className="cancelButton" onClick={() => setShowModal(false)}>
+                        İptal
+                    </button>
                 </div>
             </div>
         </div>

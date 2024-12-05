@@ -20,16 +20,16 @@ const Sales = ({ products, updateProducts, addSale }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-
+    
         if (name === "code") {
             setSaleProduct({ ...saleProduct, code: value });
-
-            // Ürün kodu ya da adı ile eşleşen ürünleri filtrele
+    
+            // Filter products by code or name, making sure they exist and are non-empty
             const foundProducts = products.filter((product) =>
-                product.code.toLowerCase().includes(value.toLowerCase()) ||
-                product.name.toLowerCase().includes(value.toLowerCase())
+                (product.code && product.code.toLowerCase().includes(value.toLowerCase())) ||
+                (product.name && product.name.toLowerCase().includes(value.toLowerCase()))
             );
-            setFilteredProducts(foundProducts); // Eşleşen ürünleri state'e kaydet
+            setFilteredProducts(foundProducts); 
         } else {
             setSaleProduct({ ...saleProduct, [name]: value });
         }
