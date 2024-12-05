@@ -1,0 +1,20 @@
+.modalButton {
+    margin: 10px;
+}
+
+.modalButton2 {
+    margin: 10px;
+}
+
+.suggestions-list {
+    list-style-type: none;
+    border: 1px solid #ccc;
+    background-color: white;
+
+}
+
+.suggestions-list li {}
+
+.suggestions-list li:hover {
+    background-color: #f0f0f0;
+}

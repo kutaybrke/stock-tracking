@@ -1,0 +1,184 @@
+.app-container {
+  font-family: Arial, sans-serif;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: #f1f1f1;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+}
+
+.start-date {
+  margin: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  background-color: #f8f8f8;
+  width: 200px;
+  border-right: 1px solid #ccc;
+  padding: 10px;
+}
+
+.sidebar button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.sidebar .exit-button {
+  background-color: #dc3545;
+}
+
+.sidebar button:hover {
+  opacity: 0.9;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.table-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.footer-actions input {
+  padding: 5px;
+  width: 150px;
+}
+
+.footer-actions button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.footer-actions button:hover {
+  opacity: 0.9;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input {
+  border-width: 2px;
+  border-radius: 10px;
+  height: 30px;
+  padding: 5px;
+
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modalContentSalesReport {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 90%;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.addButton {
+  width: 100%;
+  margin: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  color: white;
+  background-color: #007bff;
+}
+
+.cancelButton {
+  width: 100%;
+  margin: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  color: white;
+  background-color: #007bff;
+}
+
+.closeButton {
+  width: 10%;
+  margin: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  color: white;
+  background-color: #007bff;
+}
