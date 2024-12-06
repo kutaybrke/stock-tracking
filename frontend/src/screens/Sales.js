@@ -45,39 +45,77 @@ const Sales = ({ products, updateProducts, addSale }) => {
         setFilteredProducts([]); // Seçilen ürünü aldıktan sonra öneri listesini temizle
     };
 
-    const handleSale = () => {
-        const saleQty = parseInt(saleQuantity, 10); // Kullanıcının girdiği satış adedi
-        const totalSalePrice = salePrice * saleQty;
+    const addProductSale = async (saleData) => {
+        try {
+            const response = await fetch("http://localhost:5000/product-sales", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(saleData),
 
-        if (saleQty > 0 && saleProduct.stock >= saleQty) {
-            // Ürün satıldığında stok güncelleniyor
-            const updatedProducts = products.map((product) =>
-                product.urunKodu === saleProduct.code
-                    ? { ...product, urunAdeti: product.urunAdeti - saleQty }
-                    : product
-            );
-            updateProducts(updatedProducts);
-
-            // Satış verisini kaydediyoruz
-            addSale({
-                date: saleDate,
-                productName: saleProduct.name,
-                quantity: saleQty,
-                unitPrice: salePrice,
-                totalPrice: totalSalePrice,
             });
+            console.log("Gönderilen Veri:", saleData);
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || "Satış eklenemedi.");
+            }
 
-            // Modal'ı kapatıyoruz ve input'ları sıfırlıyoruz
-            setShowModal(false);
-            setSaleProduct({ code: "", name: "", stock: "", price: "" });
-            setSaleQuantity(1);
-            setSalePrice("");
-            setSaleDate("");
-            setErrorMessage(""); // Hata mesajını sıfırla
-        } else {
-            setErrorMessage("Lütfen tüm alanları doldurduğunuzdan emin olun ve satış adedini kontrol edin.");
+            const data = await response.json();
+            return data; // Satış ekleme işlemi başarılıysa dönen yanıt
+        } catch (error) {
+            console.error("Satış eklenirken hata oluştu:", error.message);
+
+            throw error;
         }
     };
+
+    const handleSale = async () => {
+        const saleQty = parseInt(saleQuantity, 10); // Kullanıcının girdiği satış adedi
+
+        if (saleQty > 0) {
+            const saleData = {
+                urunKodu: saleProduct.code,
+                urunAdi: saleProduct.name,
+                urunStokAdeti: saleProduct.stock,
+                urunSatisAdeti: saleQty,
+                satisFiyati: salePrice,
+                tarih: saleDate || today,
+            };
+            console.log("Gönderilen Veri:", saleData);
+            try {
+                // Backend API'ye satış ekleme isteği gönder
+                const response = await addProductSale(saleData);
+
+                console.log("Satış başarıyla kaydedildi:", response);
+
+                // Güncel ürün listesini backend'den çekin
+                const updatedResponse = await fetch("http://localhost:5000/allproducts");
+                if (updatedResponse.ok) {
+                    const updatedProducts = await updatedResponse.json();
+                    updateProducts(updatedProducts); // Parent'daki ürün listesini güncelle
+                } else {
+                    console.error("Güncellenmiş ürünler getirilemedi.");
+                }
+
+
+
+                // Modal'ı kapat ve formu sıfırla
+                setShowModal(false);
+                setSaleProduct({ code: "", name: "", stock: "", price: "" });
+                setSaleQuantity(1);
+                setSalePrice("");
+                setSaleDate("");
+                setErrorMessage("");
+            } catch (error) {
+                setErrorMessage(error.message);
+            }
+        } else {
+            setErrorMessage("Lütfen satış adedini kontrol edin.");
+        }
+    };
+
+
 
     return (
         <div>

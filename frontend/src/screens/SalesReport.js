@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const SalesReport = ({ salesData }) => {
+const SalesReport = () => {
     // Bugünün tarihini almak ve formatlamak (yerel zaman dilimi)
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Saat kısmını sıfırlıyoruz
@@ -8,14 +8,42 @@ const SalesReport = ({ salesData }) => {
 
     const [startDate, setStartDate] = useState(formattedToday);  // Başlangıç tarihi bugünden başlasın
     const [endDate, setEndDate] = useState(formattedToday);      // Bitiş tarihi bugünden başlasın
+    const [salesData, setSalesData] = useState([]); // Satış verilerini saklamak için state
+    const [loading, setLoading] = useState(true);  // Yükleniyor durumunu takip etmek için
 
+    // Fetch sales data from the backend
+    useEffect(() => {
+        const fetchSalesData = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/product-sales");
+                if (response.ok) {
+                    const data = await response.json();
+                    setSalesData(data); // Sales data state'ini güncelle
+                } else {
+                    console.error("Satış verileri alınamadı.");
+                }
+            } catch (error) {
+                console.error("Satış verileri alınırken bir hata oluştu:", error);
+            } finally {
+                setLoading(false); // Veriler alındığında yükleniyor durumunu sonlandır
+            }
+        };
+
+        fetchSalesData();
+    }, []);
+
+    // Filtreleme işlemi
     const filteredSales = salesData.filter(sale => {
-        // Başlangıç ve bitiş tarihleri arasındaki satışları filtreleme
-        const saleDate = new Date(sale.date);
+        const saleDate = new Date(sale.tarih);  // Satış tarihini al
         const isAfterStart = startDate ? saleDate >= new Date(startDate) : true;
         const isBeforeEnd = endDate ? saleDate <= new Date(endDate) : true;
         return isAfterStart && isBeforeEnd;
     });
+
+    // Eğer veriler yükleniyorsa, yükleniyor mesajı göster
+    if (loading) {
+        return <div>Yükleniyor...</div>;
+    }
 
     return (
         <div>
@@ -53,11 +81,11 @@ const SalesReport = ({ salesData }) => {
                 <tbody>
                     {filteredSales.map((sale, index) => (
                         <tr key={index}>
-                            <td>{sale.date}</td>
-                            <td>{sale.productName}</td>
-                            <td>{sale.quantity}</td>
-                            <td>{sale.unitPrice}</td>
-                            <td>{sale.totalPrice}</td>
+                            <td>{sale.tarih}</td>
+                            <td>{sale.urunAdi}</td>
+                            <td>{sale.urunSatisAdeti}</td>
+                            <td>{sale.satisFiyati}</td>
+                            <td>{sale.urunSatisAdeti * sale.satisFiyati} ₺</td>
                         </tr>
                     ))}
                 </tbody>

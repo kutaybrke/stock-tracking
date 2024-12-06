@@ -23,7 +23,7 @@ GET http://localhost:3000/products/TOF 31000010
 DELETE http://localhost:3000/products/EGZ1001
 
 ### URUN SATISI POST
-POST http://localhost:3000/product-sales
+GET http://localhost:5000/product-sales
 Content-Type: application/json
 
 {
