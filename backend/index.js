@@ -1,6 +1,7 @@
 const express = require('express');
 const productController = require('./controllers/productController');
 const productSalesController = require('./controllers/productSalesController');
+const productStockController = require('./controllers/productStockConroller');
 const sequelize = require('./config/db'); // Sequelize bağlantısı
 const cors = require("cors");
 
@@ -31,6 +32,9 @@ app.get('/products/:urunKodu', productController.getProductByCode);
 
 app.get('/product-sales', productSalesController.getAllProductSales);
 app.post('/product-sales', productSalesController.addProductSale);
+
+app.get('/product-stock', productStockController.allProductStock);
+
 
 // Sunucuyu başlat
 app.listen(PORT, () => {

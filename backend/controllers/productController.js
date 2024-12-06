@@ -5,7 +5,11 @@ const productController = {
     getAllProducts: async (req, res) => {
         try {
             const products = await Product.findAll();  // Sequelize ile ürünleri getir
-            res.json(products);
+            // eger product urunu 0 ise urunu gonderme
+            const productStock = products.filter(product => product.urunAdeti > 0);
+            res.json(productStock);
+
+
         } catch (err) {
             res.status(500).json({ error: 'Ürünler getirilemedi.' });
         }
@@ -13,7 +17,7 @@ const productController = {
 
     getAllProductsSalesFind: async (req, res) => {
         try {
-            const { query } = req.query; 
+            const { query } = req.query;
 
             const whereCondition = query
                 ? {
@@ -22,11 +26,11 @@ const productController = {
                         { urunAdi: { [Sequelize.Op.iLike]: `%${query}%` } }
                     ]
                 }
-                : {};  
-            
+                : {};
+
             const products = await Product.findAll({ where: whereCondition });
 
-            res.json(products); 
+            res.json(products);
         } catch (err) {
             res.status(500).json({ error: 'Ürünler getirilemedi.' });
         }
