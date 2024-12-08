@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "../style/StockControl.css";
+import exportToPDF from "../Components/exportToPDF";
 
 const StockControl = ({ goBack }) => {
-    const [lowStockProducts, setLowStockProducts] = useState([]); // Stokları düşük ürünler
-    const [loading, setLoading] = useState(true); // Yüklenme durumu
+    const [lowStockProducts, setLowStockProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Backend'den düşük stok verilerini al
+
     useEffect(() => {
         const fetchLowStockProducts = async () => {
             try {
@@ -19,7 +20,7 @@ const StockControl = ({ goBack }) => {
             } catch (error) {
                 console.error("Bir hata oluştu:", error);
             } finally {
-                setLoading(false); // Yüklenme durumu bitti
+                setLoading(false);
             }
         };
 
@@ -29,6 +30,9 @@ const StockControl = ({ goBack }) => {
     if (loading) {
         return <div>Yükleniyor...</div>;
     }
+    const handleExportToPDF = () => {
+        exportToPDF(lowStockProducts, "Stok Durumu Raporu");
+    };
 
     return (
         <div className="stock-control-container">
@@ -51,6 +55,10 @@ const StockControl = ({ goBack }) => {
                     ))}
                 </tbody>
             </table>
+            {/* "Raporla ve Yazdır" butonu */}
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+                <button style={{ backgroundColor: '#007bff', border: 'none', padding: 10, color: 'white', borderRadius: 10 }} onClick={handleExportToPDF}>Raporla ve Yazdır</button>
+            </div>
             <button className="closeButton" onClick={goBack}>Kapat</button>
         </div>
     );

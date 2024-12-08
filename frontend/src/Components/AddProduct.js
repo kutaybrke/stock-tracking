@@ -11,8 +11,6 @@ const AddProduct = ({ setShowModal, products, setProducts, setSalesData }) => {
 
     const [errorMessage, setErrorMessage] = useState(""); // Hata mesajı durumu
 
-
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewProduct({ ...newProduct, [name]: value });

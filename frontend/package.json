@@ -6,17 +6,23 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
+    "chart.js": "^4.4.7",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.0.2",
     "react-scripts": "^5.0.1",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "xlsx": "^0.18.5"
   },
   "main": "main.js",
   "scripts": {
     "start": "concurrently \"npm run start-frontend\" \"npm run start-backend\"",
-    "start-frontend": "react-scripts start",  
-    "start-backend": "cd.. && cd backend && npm start", 
+    "start-frontend": "react-scripts start",
+    "start-backend": "cd.. && cd backend && npm start",
     "electron": "electron .",
     "build": "react-scripts build",
     "dist": "electron-builder"

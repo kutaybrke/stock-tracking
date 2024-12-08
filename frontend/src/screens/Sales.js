@@ -14,8 +14,6 @@ const Sales = ({ products, updateProducts, addSale }) => {
     const [saleDate, setSaleDate] = useState(""); // Satış tarihi
     const [filteredProducts, setFilteredProducts] = useState([]); // Ürünleri filtrelemek için state
     const [errorMessage, setErrorMessage] = useState(""); // Hata mesajı durumu
-
-    // Set today's date as default for saleDate
     const today = new Date().toISOString().split("T")[0];
 
     const handleInputChange = (e) => {
@@ -24,7 +22,6 @@ const Sales = ({ products, updateProducts, addSale }) => {
         if (name === "code") {
             setSaleProduct({ ...saleProduct, code: value });
 
-            // Filter products by code or name, making sure they exist and are non-empty
             const foundProducts = products.filter((product) =>
                 (product.urunKodu && product.urunKodu.toLowerCase().includes(value.toLowerCase())) ||
                 (product.urunAdi && product.urunAdi.toLowerCase().includes(value.toLowerCase()))
@@ -97,9 +94,6 @@ const Sales = ({ products, updateProducts, addSale }) => {
                 } else {
                     console.error("Güncellenmiş ürünler getirilemedi.");
                 }
-
-
-
                 // Modal'ı kapat ve formu sıfırla
                 setShowModal(false);
                 setSaleProduct({ code: "", name: "", stock: "", price: "" });
@@ -181,8 +175,8 @@ const Sales = ({ products, updateProducts, addSale }) => {
                             className="input"
                             type="date"
                             name="saleDate"
-                            value={saleDate || today} // Default to today's date
-                            min={today} // Disable previous dates
+                            value={saleDate || today}
+                            min={today}
                             onChange={(e) => setSaleDate(e.target.value)}
                         />
                         {errorMessage && (

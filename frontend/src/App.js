@@ -4,22 +4,36 @@ import Sales from "./screens/Sales";
 import SalesReport from "./screens/SalesReport";
 import StockControl from "./screens/StockControl";
 import AddProduct from "./Components/AddProduct";
+import ProductFilter from "./Components/ProductFilter";
+import { deleteProduct, editProduct, EditProductForm, DeleteProductButton } from "./Components/Action";
+import Pagination from "./Components/Pagination";
 
 const App = () => {
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showSalesReportModal, setShowSalesReportModal] = useState(false);
   const [showStockControlModal, setShowStockControlModal] = useState(false);
-  const [salesData, setSalesData] = useState([]); // salesData state
+  const [salesData, setSalesData] = useState([]);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState(null);
+  const [filterValue, setFilterValue] = useState("");
 
-  // Backend'den ürünleri çekmek için useEffect
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const handleFilterChange = (e) => {
+    setFilterValue(e.target.value);
+    setCurrentPage(1);
+  };
+
+  // Fetch Products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/allproducts"); // Backend URL
+        const response = await fetch("http://localhost:5000/allproducts");
         if (response.ok) {
-          const data = await response.json(); // JSON formatında yanıt
-          setProducts(data); // Gelen veriyi state'e kaydet
+          const data = await response.json();
+          setProducts(data);
         } else {
           console.error("Ürünler getirilemedi.");
         }
@@ -28,28 +42,49 @@ const App = () => {
       }
     };
 
-    fetchProducts(); // Fonksiyonu çağır
-  }, []); // Sadece bir kez çalışması için boş bir bağımlılık dizisi
+    fetchProducts();
+  }, []);
 
-  const addSale = (sale) => {
-    setSalesData([...salesData, sale]); // salesData'yı güncelle
+
+  const handleEditProduct = (index) => {
+    const realIndex = (currentPage - 1) * itemsPerPage + index;
+    const product = products[realIndex];
+    setProductToEdit({ ...product, index: realIndex });
+    setEditModalOpen(true);
   };
 
-  const handleShowSalesReport = () => {
-    setShowSalesReportModal(true);
+  // Düzenlenen Ürünü Kaydet backend için burayı kullanabilirsin
+  const handleSaveEdit = (editedProduct) => {
+    if (productToEdit) {
+      const updatedProduct = {
+        ...productToEdit,
+        ...editedProduct,
+      };
+      const updatedProducts = editProduct(products, productToEdit.index, updatedProduct);
+      setProducts(updatedProducts);
+      setEditModalOpen(false);
+      setProductToEdit(null);
+    }
   };
 
-  const handleCloseSalesReport = () => {
-    setShowSalesReportModal(false);
+  // ürün sil  backend için burayı kullanabilirsin
+  const handleDeleteProduct = (index) => {
+    const realIndex = (currentPage - 1) * itemsPerPage + index;
+    const updatedProducts = deleteProduct(products, realIndex);
+    setProducts(updatedProducts);
   };
 
-  const handleShowStockControl = () => {
-    setShowStockControlModal(true); // StockControl modal'ını aç
-  };
+  // Filter
+  const filteredProducts = products.filter((product) =>
+    product.urunKodu.toLowerCase().includes(filterValue.toLowerCase())
+  );
 
-  const handleCloseStockControl = () => {
-    setShowStockControlModal(false); // StockControl modal'ını kapat
-  };
+  // Sayfalama 
+  const indexOfLastProduct = currentPage * itemsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="app-container">
@@ -59,13 +94,14 @@ const App = () => {
       <div className="main-container">
         <div className="sidebar">
           <button>Ürün Kayıt</button>
-          <Sales products={products} updateProducts={setProducts} addSale={addSale} />
-          <button onClick={handleShowSalesReport}>Tarihe Göre Satış Rapor</button>
-          <button onClick={handleShowStockControl}>Stokta Eksik Olan Ürünlerin Bilgisi</button>
-          <button className="exit-button">Programdan Çık</button>
+          <Sales products={products} updateProducts={setProducts} addSale={(sale) => setSalesData([...salesData, sale])} />
+          <button onClick={() => setShowSalesReportModal(true)}>Tarihe Göre Satış Rapor</button>
+          <button onClick={() => setShowStockControlModal(true)}>Stokta Eksik Olan Ürünlerin Bilgisi</button>
+          <button className="exit-button" onClick={() => window.close()}>Programdan Çık</button>
         </div>
         <div className="content">
           <div className="table-container">
+            <ProductFilter filterValue={filterValue} setFilterValue={handleFilterChange} />
             <table>
               <thead>
                 <tr>
@@ -74,62 +110,62 @@ const App = () => {
                   <th>Stok Adedi</th>
                   <th>Ürün Fiyatı</th>
                   <th>Aldığı Firma</th>
+                  <th>Aksiyonlar</th>
                 </tr>
               </thead>
               <tbody>
-                {products.map((product, index) => (
+                {currentProducts.map((product, index) => (
                   <tr key={index}>
                     <td>{product.urunKodu}</td>
                     <td>{product.urunAdi}</td>
                     <td>{product.urunAdeti}</td>
                     <td>{product.adetFiyati}</td>
                     <td>{product.alinanFirma}</td>
+                    <td>
+                      <button className="icon" onClick={() => handleEditProduct(index)}>✏️</button>
+                      <DeleteProductButton index={index} handleDeleteProduct={handleDeleteProduct} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className="footer">
-            <p>Stokta 150 adet'e kadar olan ürünler listelenmiştir..</p>
-            <div className="footer-actions">
-              <input type="number" placeholder="Adet Giriniz: 150" />
-              <button>Listele</button>
-              <button onClick={() => setShowModal(true)}>Ürün Ekle</button>
-              <button>Raporla ve Yazdır</button>
-            </div>
+          <Pagination
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredProducts.length}
+            currentPage={currentPage}
+            paginate={paginate}
+          />
+          <div className="footer-actions">
+            <button style={{ backgroundColor: '#007bff', border: 'none', padding: 10, color: 'white', borderRadius: 10 }} onClick={() => setShowModal(true)}>Ürün Ekle</button>
           </div>
         </div>
       </div>
-
-      {/* Ürün Ekle Modal */}
       {showModal && (
-        <AddProduct
-          setShowModal={setShowModal}
-          products={products}
-          setProducts={setProducts}
-          setSalesData={setSalesData} // Burada setSalesData'yı da prop olarak geçtim
-        />
+        <AddProduct setShowModal={setShowModal} products={products} setProducts={setProducts} />
       )}
-
-      {/* Satış Raporu Modal */}
       {showSalesReportModal && (
         <div className="modal">
           <div className="modalContentSalesReport">
             <SalesReport salesData={salesData} />
-            <div className="modal-actions">
-              <button className="closeButton" onClick={handleCloseSalesReport}>Kapat</button>
-            </div>
+            <button className="closeButton" onClick={() => setShowSalesReportModal(false)}>Kapat</button>
           </div>
         </div>
       )}
-
-      {/* StockControl Modal */}
       {showStockControlModal && (
         <div className="modal">
           <div className="modalContentSalesReport">
-            <StockControl products={products} goBack={handleCloseStockControl} />
+            <StockControl products={products} goBack={() => setShowStockControlModal(false)} />
           </div>
         </div>
+      )}
+      {editModalOpen && (
+        <EditProductForm
+          productToEdit={productToEdit}
+          setProductToEdit={setProductToEdit}
+          handleSaveEdit={handleSaveEdit}
+          setEditModalOpen={setEditModalOpen}
+        />
       )}
     </div>
   );
